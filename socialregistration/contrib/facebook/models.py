@@ -26,12 +26,12 @@ class FacebookAccessToken(models.Model):
 
 def save_facebook_token(sender, user, profile, client, **kwargs):    
     try:
-        FacebookAccessToken.objects.get(profile=profile).delete()
+        access_token = FacebookAccessToken.objects.get(profile=profile)
     except FacebookAccessToken.DoesNotExist:
-        pass
+        access_token = FacebookAccessToken(profile=profile)
     
-    FacebookAccessToken.objects.create(profile=profile,
-        access_token=client.graph.access_token)
+    access_token.access_token = client.graph.access_token
+    access_token.save()
     
 connect.connect(save_facebook_token, sender=FacebookProfile,
     dispatch_uid='socialregistration.facebook.connect')
